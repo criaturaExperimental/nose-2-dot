@@ -3,10 +3,10 @@ let poseNet;
 let poses = [];
 let noseX = 0;
 let noseY = 0;
-const RADIOUS = 70;
 let goal;
 let scoreBoard;
 let timer;
+let modelIsLoaded;
 
 function setup() {
   createCanvas(640, 480);
@@ -14,16 +14,34 @@ function setup() {
   video.size(width, height);
   // Hide the video element, and just show the canvas
   video.hide();
+  textAlign(CENTER);
+
+  timer = new Timer({
+    seconds: 20,
+    position: {
+      x: width / 2,
+      y: height / 2
+    }
+  });
+  setInterval(timeIt, 1000);
 
   goal = new Goal();
   // scoreBoard = new Score(100, 200);
-  scoreBoard = new Score(width*1/15, (height * 1)/16);
+  scoreBoard = new Score(width*2/15, (height * 1)/16);
 
   // Create a new poseNet method with a single detection
   poseNet = ml5.poseNet(video, modelReady);
   // This sets up an event that fills the global variable "poses"
   // with an array every time new poses are detected
   poseNet.on('pose', gotPoses);
+}
+
+function timeIt() {
+  if (timer.seconds > 0) {
+    timer.countDownBy(1);
+  } else {
+    timer.endCount();
+  }
 }
 
 function gotPoses(poses) {
@@ -35,6 +53,7 @@ function gotPoses(poses) {
 
 function modelReady() {
   select('#status').html('Model Loaded');
+  modelIsLoaded = true;
 }
 
 function draw() {
@@ -42,8 +61,12 @@ function draw() {
 
   scoreBoard.display();
 
-  drawNose();
-  goal.renderGoal();
+  if(modelIsLoaded){
+    timer.display();
+    drawNose();
+    goal.renderGoal();
+  }
+
   let match = goal.wasHit(noseX, noseY);
   if(match){
     scoreBoard.addPoints(1);
