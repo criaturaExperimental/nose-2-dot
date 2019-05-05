@@ -4,7 +4,9 @@ let poses = [];
 let noseX = 0;
 let noseY = 0;
 const RADIOUS = 70;
-let goal = null;
+let goal;
+let scoreBoard;
+let timer;
 
 function setup() {
   createCanvas(640, 480);
@@ -14,6 +16,8 @@ function setup() {
   video.hide();
 
   goal = new Goal();
+  // scoreBoard = new Score(100, 200);
+  scoreBoard = new Score(width*1/15, (height * 1)/16);
 
   // Create a new poseNet method with a single detection
   poseNet = ml5.poseNet(video, modelReady);
@@ -36,9 +40,14 @@ function modelReady() {
 function draw() {
   image(video, 0, 0, width, height);
 
+  scoreBoard.display();
+
   drawNose();
   goal.renderGoal();
-  goal.wasHit(noseX, noseY);
+  let match = goal.wasHit(noseX, noseY);
+  if(match){
+    scoreBoard.addPoints(1);
+  }
   // We can call both functions to draw all keypoints and the skeletons
   // drawKeypoints();
   // drawSkeleton();
@@ -81,33 +90,4 @@ function drawSkeleton() {
       line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
     }
   }
-}
-
-// Class for goal
-class Goal {
-  constructor(){
-  this.diameter = 60,
-  this.radius = this.diameter / 2,
-  this.pos = this._generateRandomPos(),
-  this.distance = null
-  }
-  _generateRandomPos() {
-    return {
-      x: random(this.radius, width - this.radius),
-      y: random(this.radius, height - this.radius)
-    }
-  }
-  wasHit(targetX, targetY){
-    this.distance = dist(targetX, targetY, this.pos.x, this.pos.y);
-    if(this.distance < (this.diameter)) {
-      console.log('hit');
-      this.pos = this._generateRandomPos();
-    }
-  }
-  renderGoal(){
-    strokeWeight(0);
-    fill(0, 0, 222);
-    ellipse(this.pos.x, this.pos.y, 60, 60);
-  }
-
 }
