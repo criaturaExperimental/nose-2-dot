@@ -63,8 +63,10 @@ function draw() {
 
   if(modelIsLoaded){
     timer.display();
-    drawNose();
-    goal.renderGoal();
+    if(timer.isOnTime()){
+      drawNose();
+      goal.renderGoal();
+    }
   }
 
   let match = goal.wasHit(noseX, noseY);
