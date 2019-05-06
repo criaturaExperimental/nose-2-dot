@@ -17,7 +17,7 @@ function setup() {
   textAlign(CENTER);
 
   timer = new Timer({
-    seconds: 20,
+    seconds: 60,
     position: {
       x: width / 2,
       y: height / 2
